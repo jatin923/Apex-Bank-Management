@@ -15,7 +15,9 @@ app.use(express.json());
 
 // Request logging middleware
 app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+    console.log(
+        `[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`
+    );
     next();
 });
 
@@ -36,15 +38,22 @@ app.use('/api/transactions', transactionRoutes);
 // Global Error Handler
 app.use((err, req, res, next) => {
     console.error('Global Error Handler:', err.stack);
+
     res.status(500).json({
         success: false,
         message: err.message || 'Internal Server Error'
     });
 });
 
-app.listen(PORT, () => {
-    console.log(`====================================================`);
-    console.log(`🚀 Bank Management API Server running on port ${PORT}`);
-    console.log(`👉 Health Check: http://localhost:${PORT}/api/health`);
-    console.log(`====================================================`);
-});
+// Local development server
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log('====================================================');
+        console.log(`🚀 Bank Management API Server running on port ${PORT}`);
+        console.log(`👉 Health Check: http://localhost:${PORT}/api/health`);
+        console.log('====================================================');
+    });
+}
+
+// Export app for Vercel
+module.exports = app;
